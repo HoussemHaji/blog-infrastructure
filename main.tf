@@ -1,60 +1,29 @@
-# configure Azure Provider
-provider "azurerm"{
-    features {}
-    subscription_id = ""
+# Configure Azure Provider
+provider "azurerm" {
+  features {}
 }
 
-# Add resource group
+# Resource Group
 resource "azurerm_resource_group" "rg" {
-  name = "my-aks-cluster-rg"
-  location = "West Europe"
+  name = var.resource_group_name
+  location = var.location
 }
 
-
-# Add vnet and subnet
-resource "azurerm_virtual_network" "vnet" {
-  name = "my-aks-vnet"
-  location = azurerm_resource_group.rg.location
-  address_space = ["10.0.0.0/16"]
-
-  subnet {
-    name = "my-aks-subnet"
-    address_prefix = "10.0.1.0/24"
-  }
-}
-
-# Add aks cluster
-resource "azurerm_kubernetes_cluster" "aks_cluster" {
-  name = var.cluster_name
-  location = azurerm_resource_group.rg.location
+# AKS Cluster
+resource "azurerm_kubernetes_cluster" "aks" {
+  name                = var.cluster_name
+  location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
 
-  default_node_pool {
-    name       = "default"
-    node_count = 1
-    vm_size    = "Standard_D2_v2"
+
+
+  node_pool_name = var.cluster_name
+
+  linux_node_pool {
+    name      = var.node_pool_name
+    vm_size   = var.node_vm_size
+    node_count = var.node_count
   }
 
-
-}
-
-
-resource "azurerm_mysql_server" "db_server" {
-  name = "my-db-server"
-  location = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-
-  sku {
-    name = "B_Basic_1"
-    tier = "Basic"
-    capacity = 1
-  }
-
-  administrator_login = "myadmin"
-  administrator_login_password = "your_password"  # Store securely!
-}
-
-resource "azurerm_mysql_database" "db" {
-  name = "mydatabase"
-  server_id = azurerm_mysql_server.db_server.id
+  
 }
