@@ -25,7 +25,7 @@ resource "azurerm_virtual_network" "vnet" {
 
 # Add aks cluster
 resource "azurerm_kubernetes_cluster" "aks_cluster" {
-  name = "my-aks-cluster"
+  name = var.cluster_name
   location = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
 
@@ -36,4 +36,25 @@ resource "azurerm_kubernetes_cluster" "aks_cluster" {
   }
 
 
+}
+
+
+resource "azurerm_mysql_server" "db_server" {
+  name = "my-db-server"
+  location = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+
+  sku {
+    name = "B_Basic_1"
+    tier = "Basic"
+    capacity = 1
+  }
+
+  administrator_login = "myadmin"
+  administrator_login_password = "your_password"  # Store securely!
+}
+
+resource "azurerm_mysql_database" "db" {
+  name = "mydatabase"
+  server_id = azurerm_mysql_server.db_server.id
 }
