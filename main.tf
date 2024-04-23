@@ -7,7 +7,7 @@ provider "azurerm"{
 # Add resource group
 resource "azurerm_resource_group" "rg" {
   name = "my-aks-cluster-rg"
-  location = "East US"
+  location = "West Europe"
 }
 
 
@@ -21,4 +21,19 @@ resource "azurerm_virtual_network" "vnet" {
     name = "my-aks-subnet"
     address_prefix = "10.0.1.0/24"
   }
+}
+
+# Add aks cluster
+resource "azurerm_kubernetes_cluster" "aks_cluster" {
+  name = "my-aks-cluster"
+  location = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+
+  default_node_pool {
+    name       = "default"
+    node_count = 1
+    vm_size    = "Standard_D2_v2"
+  }
+
+
 }
