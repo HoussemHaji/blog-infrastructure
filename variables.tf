@@ -22,3 +22,8 @@ variable "node_count" {
   type = number
   description = "Number of virtual machines in the node pool"
 }
+
+variable "subscription_id"{
+    type= string
+    description= "subscription id for azure"
+}
